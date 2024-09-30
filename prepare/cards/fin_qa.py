@@ -5,6 +5,7 @@ from unitxt.blocks import (
 )
 from unitxt.catalog import add_to_catalog
 from unitxt.operators import Copy, FilterByExpression
+from unitxt.splitters import SplitRandomMix
 from unitxt.struct_data_operators import MapTableListsToStdTableJSON
 from unitxt.task import Task
 from unitxt.templates import InputOutputTemplate
@@ -12,8 +13,17 @@ from unitxt.test_utils.card import test_card
 from unitxt.types import Table
 
 card = TaskCard(
-    loader=LoadHF(path="ibm/finqa", streaming=False),
+    loader=LoadHF(
+        path="ibm/finqa", data_classification_policy=["public"], streaming=False
+    ),
     preprocess_steps=[
+        SplitRandomMix(
+            mix={
+                "train": "train[50%]",
+                "validation": "train[50%]",
+                "test": "test+validation",
+            }
+        ),
         FilterByExpression(expression="len(table) > 1"),
         Copy(field="pre_text/0", to_field="pre_text"),
         Copy(field="post_text/0", to_field="post_text"),

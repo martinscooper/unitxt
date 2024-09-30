@@ -103,7 +103,14 @@ class HFPipelineBasedInferenceEngine(
         model_args: Dict[str, Any] = (
             {"torch_dtype": torch.float16} if self.use_fp16 else {}
         )
-        model_args.update({"max_new_tokens": self.max_new_tokens, "batch_size": 16})
+        model_args.update(
+            {
+                "max_new_tokens": self.max_new_tokens,
+                "batch_size": 16,
+                "temperature": 0.001,
+                "do_sample": True,
+            }
+        )
 
         device = torch.device(
             "mps"
@@ -373,6 +380,9 @@ class OpenAiInferenceEngine(
     def _infer(self, dataset):
         outputs = []
         for instance in tqdm(dataset, desc="Inferring with openAI API"):
+            # print(
+            #     self.model_name,
+            # )
             response = self.client.chat.completions.create(
                 messages=[
                     # {
