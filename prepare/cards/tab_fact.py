@@ -6,6 +6,7 @@ from unitxt.blocks import (
     TaskCard,
 )
 from unitxt.catalog import add_to_catalog
+from unitxt.splitters import SplitRandomMix
 from unitxt.test_utils.card import test_card
 
 # Set unitxt.settings.allow_unverified_code=True or environment variable: UNITXT_ALLOW_UNVERIFIED_CODE to True
@@ -15,6 +16,13 @@ card = TaskCard(
         path="ibm/tab_fact", streaming=False, data_classification_policy=["public"]
     ),
     preprocess_steps=[
+        SplitRandomMix(
+            mix={
+                "train": "train[50%]",
+                "validation": "train[50%]",
+                "test": "test+validation",
+            }
+        ),
         Rename(field_to_field={"table": "text_a", "statement": "text_b"}),
         MapInstanceValues(mappers={"label": {"0": "refuted", "1": "entailed"}}),
         Set(

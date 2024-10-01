@@ -29,7 +29,12 @@ card = TaskCard(
     templates=TemplatesList(
         [
             MultiReferenceTemplate(
-                input_format="Based on this {context_type}: {context}\nAnswer the question: {question}",
+                input_format="Answer the following question based on the provided {context_type}:"
+                "dataset:"
+                "\n**question:** {question}"
+                "\n**{context_type}:** {context}"
+                "\n**Answer:**",
+                # "Based on this {context_type}: {context}\nAnswer the question: {question}",
                 references_field="answers",
                 postprocessors=[
                     # "processors.to_list_by_comma_space",
@@ -56,5 +61,5 @@ card = TaskCard(
     },
 )
 
-test_card(card, strict=False)
+test_card(card, strict=False, num_demos=2, demos_pool_size=5)
 add_to_catalog(card, "cards.wikitq", overwrite=True)
