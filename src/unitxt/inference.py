@@ -177,6 +177,7 @@ class MockModeMixin(Artifact):
 
 
 class IbmGenAiInferenceEngineParamsMixin(Artifact):
+    batch_size: Optional[int] = None
     beam_width: Optional[int] = None
     decoding_method: Optional[Literal["greedy", "sample"]] = None
     include_stop_sequence: Optional[bool] = None
@@ -298,7 +299,7 @@ class IbmGenAiInferenceEngine(
         genai_params = TextGenerationParameters(
             **self.to_dict([IbmGenAiInferenceEngineParamsMixin])
         )
-
+        # print(genai_params)
         return [
             response.results[0].generated_text
             for response in self.client.text.generation.create(
@@ -377,29 +378,62 @@ class OpenAiInferenceEngine(
             if v is not None
         }
 
-    def _infer(self, dataset):
+    # def _infer(self, dataset):
+    #     outputs = []
+    #     for instance in tqdm(dataset, desc="Inferring with openAI API"):
+    #         # print(
+    #         #     self.model_name,
+    #         # )
+    #         response = self.client.chat.completions.create(
+    #             messages=[
+    #                 # {
+    #                 #     "role": "system",
+    #                 #     "content": self.system_prompt,
+    #                 # },
+    #                 {
+    #                     "role": "user",
+    #                     "content": instance["source"],
+    #                 }
+    #             ],
+    #             model=self.model_name,
+    #             **self._get_completion_kwargs(),
+    #         )
+    #         output = response.choices[0].message.content
+    #
+    #         outputs.append(output)
+    #
+    #     return outputs
+
+    def _infer(self, dataset, batch_size=16):
         outputs = []
-        for instance in tqdm(dataset, desc="Inferring with openAI API"):
-            # print(
-            #     self.model_name,
-            # )
-            response = self.client.chat.completions.create(
-                messages=[
-                    # {
-                    #     "role": "system",
-                    #     "content": self.system_prompt,
-                    # },
+
+        # Split dataset into batches
+        batches = [
+            dataset[i : i + batch_size] for i in range(0, len(dataset), batch_size)
+        ]
+
+        for batch in tqdm(batches, desc="Inferring with OpenAI API in Batches"):
+            # Create messages for the batch
+            messages_batch = []
+            for instance in batch:
+                messages_batch.append(
                     {
                         "role": "user",
                         "content": instance["source"],
                     }
-                ],
+                )
+
+            # Perform the inference using the batch
+            response = self.client.chat.completions.create(
+                messages=messages_batch,  # Send the whole batch
                 model=self.model_name,
                 **self._get_completion_kwargs(),
             )
-            output = response.choices[0].message.content
 
-            outputs.append(output)
+            # Process each response in the batch
+            for _, message in enumerate(response.choices):
+                output = message.message.content
+                outputs.append(output)
 
         return outputs
 

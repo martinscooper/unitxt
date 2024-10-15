@@ -9,7 +9,7 @@ from unitxt.blocks import (
 )
 from unitxt.catalog import add_to_catalog
 from unitxt.splitters import SplitRandomMix
-from unitxt.struct_data_operators import TruncateTableRows
+from unitxt.struct_data_operators import GetMaskedTableHeader, TruncateTableRows
 from unitxt.test_utils.card import test_card
 from unitxt.types import Table
 
@@ -29,6 +29,7 @@ card = TaskCard(
         TruncateTableRows(
             field="table",
         ),
+        GetMaskedTableHeader(field="table"),
     ],
     task=Task(
         input_fields={
@@ -68,5 +69,5 @@ card = TaskCard(
     },
 )
 
-test_card(card, num_demos=2, demos_pool_size=10)
-add_to_catalog(card, "cards.turl_col_type", overwrite=True)
+test_card(card)
+add_to_catalog(card, "cards.turl_col_type__masked_header", overwrite=True)

@@ -667,3 +667,36 @@ class ConstructTableFromRowsCols(InstanceOperator):
         instance[self.to_field] = output_dict
 
         return instance
+
+
+class SerializeTableAsConcatenatedText(SerializeTable):
+    def process_value(self, table: Any) -> Any:
+        table_input = deepcopy(table)
+        return self.serialize_table(table_content=table_input)
+
+    # main method that serializes a table.
+    # table_content must be in the presribed input format.
+    def serialize_table(self, table_content: Dict) -> str:
+        # Extract headers and rows from the dictionary
+        header = table_content.get("header", [])
+        rows = table_content.get("rows", [])
+
+        assert header and rows, "Incorrect input table format"
+
+        return " ".join(header) + " ".join([" ".join(row) for row in rows])
+
+
+class GetEmptyTable(FieldOperator):
+    def process_value(self, table: Any) -> Any:
+        return {
+            "header": ["", ""],
+            "rows": [["", ""], ["", ""], ["", ""]],
+        }
+
+
+class GetMaskedTableHeader(FieldOperator):
+    def process_value(self, table: Any) -> Any:
+        return {
+            "header": ["Col" + str(i + 1) for i in range(len(table["rows"][0]))],
+            "rows": table["rows"],
+        }

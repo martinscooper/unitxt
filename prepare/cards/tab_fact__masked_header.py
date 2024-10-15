@@ -7,6 +7,7 @@ from unitxt.blocks import (
 )
 from unitxt.catalog import add_to_catalog
 from unitxt.splitters import SplitRandomMix
+from unitxt.struct_data_operators import GetMaskedTableHeader
 from unitxt.test_utils.card import test_card
 
 # Set unitxt.settings.allow_unverified_code=True or environment variable: UNITXT_ALLOW_UNVERIFIED_CODE to True
@@ -35,6 +36,7 @@ card = TaskCard(
                 "classes": ["refuted", "entailed"],
             }
         ),
+        GetMaskedTableHeader(field="text_a"),
     ],
     task="tasks.classification.multi_class.relation",
     templates="templates.classification.multi_class.relation.all",
@@ -50,4 +52,4 @@ card = TaskCard(
 )
 
 test_card(card)
-add_to_catalog(card, "cards.tab_fact", overwrite=True)
+add_to_catalog(card, "cards.tab_fact__masked_header", overwrite=True)

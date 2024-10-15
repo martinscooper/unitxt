@@ -7,6 +7,7 @@ from unitxt.catalog import add_to_catalog
 from unitxt.operators import Copy, FilterByExpression
 from unitxt.splitters import SplitRandomMix
 from unitxt.struct_data_operators import (
+    GetMaskedTableHeader,
     MapTableListsToStdTableJSON,
 )
 from unitxt.task import Task
@@ -32,6 +33,7 @@ card = TaskCard(
         Copy(field="pre_text/0", to_field="pre_text"),
         Copy(field="post_text/0", to_field="post_text"),
         MapTableListsToStdTableJSON(field="table"),
+        GetMaskedTableHeader(field="table"),
     ],
     task=Task(
         inputs={
@@ -90,4 +92,4 @@ test_card(
     num_demos=2,
     demos_pool_size=10,
 )
-add_to_catalog(card, "cards.fin_qa", overwrite=True)
+add_to_catalog(card, "cards.fin_qa__masked_header", overwrite=True)

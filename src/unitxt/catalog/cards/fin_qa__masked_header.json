@@ -35,6 +35,10 @@
         {
             "__type__": "map_table_lists_to_std_table_json",
             "field": "table"
+        },
+        {
+            "__type__": "get_masked_table_header",
+            "field": "table"
         }
     ],
     "task": {

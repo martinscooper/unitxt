@@ -5,7 +5,7 @@ from unitxt.blocks import (
 from unitxt.catalog import add_to_catalog
 from unitxt.operators import Set
 from unitxt.splitters import SplitRandomMix
-from unitxt.struct_data_operators import TruncateTableRows
+from unitxt.struct_data_operators import GetMaskedTableHeader, TruncateTableRows
 from unitxt.templates import MultiReferenceTemplate, TemplatesList
 from unitxt.test_utils.card import test_card
 
@@ -27,6 +27,7 @@ card = TaskCard(
         Set({"context_type": "table"}),
         # Copy(field="table", to_field="context"),
         TruncateTableRows(field="table", to_field="context"),
+        GetMaskedTableHeader(field="context"),
     ],
     task="tasks.qa.with_context.extractive[metrics=[metrics.f1_strings, metrics.unsorted_list_exact_match]]",
     templates=TemplatesList(
@@ -65,4 +66,4 @@ card = TaskCard(
 )
 
 test_card(card, strict=False, num_demos=2, demos_pool_size=5)
-add_to_catalog(card, "cards.wikitq", overwrite=True)
+add_to_catalog(card, "cards.wikitq__masked_header", overwrite=True)
