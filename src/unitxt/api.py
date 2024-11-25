@@ -6,7 +6,11 @@ from datasets import Dataset, DatasetDict, IterableDataset, IterableDatasetDict
 
 from .artifact import fetch_artifact
 from .dataset_utils import get_dataset_artifact
-from .inference import InferenceEngine, LogProbInferenceEngine, OptionSelectingByLogProbsInferenceEngine
+from .inference import (
+    InferenceEngine,
+    LogProbInferenceEngine,
+    OptionSelectingByLogProbsInferenceEngine,
+)
 from .logging_utils import get_logger
 from .metric_utils import _compute, _inference_post_process
 from .operator import SourceOperator
@@ -173,6 +177,9 @@ def infer(
     **kwargs,
 ):
     dataset = produce(instance_or_instances, dataset_query, **kwargs)
+    print('dataset[0]["task_data"]')
+    import json
+    print(json.loads(dataset[0]["task_data"]).keys())
     engine, _ = fetch_artifact(engine)
     if return_log_probs:
         if not isinstance(engine, LogProbInferenceEngine):
@@ -197,6 +204,7 @@ def infer(
             else infer_outputs
         )
     predictions = post_process(raw_predictions, dataset)
+    predictions = raw_predictions
     if return_data:
         if return_meta_data:
             infer_output_list = [
@@ -209,24 +217,6 @@ def infer(
         return dataset.add_column("raw_prediction", raw_predictions)
     return predictions
 
-def infer_log_probs(
-    instance_or_instances,
-    engine,
-    dataset_query: Optional[str] = None,
-    return_data=False,
-    **kwargs,
-):
-    dataset = produce(instance_or_instances, dataset_query, **kwargs)
-    engine, _ = fetch_artifact(engine)
-    log_probs = engine.infer_log_probs(dataset)
-    # if return_data:
-    #     for prediction, raw_prediction, instance in zip(
-    #         predictions, raw_predictions, dataset
-    #     ):
-    #         instance["prediction"] = prediction
-    #         instance["raw_prediction"] = raw_prediction
-    #     return dataset
-    return log_probs
 
 def select(
     instance_or_instances,
@@ -237,14 +227,11 @@ def select(
 ):
     dataset = produce(instance_or_instances, dataset_query, **kwargs)
     engine, _ = fetch_artifact(engine)
-    
-    raw_predictions = engine.select(dataset)
-    predictions = post_process(raw_predictions, dataset)
+    print('dataset[0]["task_data"]')
+    print(dataset[0]["task_data"])
+    predictions = engine.select(dataset)
+    # predictions = post_process(raw_predictions, dataset)
     if return_data:
-        for prediction, raw_prediction, instance in zip(
-            predictions, raw_predictions, dataset
-        ):
-            instance["prediction"] = prediction
-            instance["raw_prediction"] = raw_prediction
+        dataset = dataset.add_column("prediction", predictions)
         return dataset
     return predictions

@@ -1,0 +1,12 @@
+{
+    "__type__": "eval_assist_llm_as_judge_pairwise",
+    "inference_engine": {
+        "__type__": "open_ai_inference_engine",
+        "model_name": "gpt-4o-2024-05-13",
+        "max_tokens": 1024,
+        "seed": 42
+    },
+    "option_selection_strategy": "PARSE_OUTPUT_TEXT",
+    "evaluator_name": "GPT4",
+    "model_family": "GPT"
+}

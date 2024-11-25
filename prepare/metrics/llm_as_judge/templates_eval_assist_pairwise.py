@@ -2,8 +2,8 @@ from unitxt.eval_assist_constants import ModelFamilyEnum
 from unitxt.templates import InputOutputTemplate
 
 role_section = """
-You are provided a pair of responses (Response {option_a} and Response {option_b}) generated subject to a context. 
-You will choose the better quality response subject to the evaluation criteria. 
+You are provided a pair of responses (Response {option_a} and Response {option_b}) generated subject to a context.
+You will choose the better quality response subject to the evaluation criteria.
 
 This is the context:
 {context_variables}
@@ -71,7 +71,7 @@ Assessment Summary: <|eot_id|><|start_header_id|>assistant<|end_header_id|>
 answer_prompt_llama = f"""{{assessment_prompt}}{{assessment}}<|eot_id|>
 <|start_header_id|>user<|end_header_id|>
 {option_selection_section}
-{{choose_response_instruction}} 
+{{choose_response_instruction}}
 Answer: Response <|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
 
 
@@ -91,7 +91,7 @@ A context that includes information relevant to the nature or generation of the 
 {response_b}
 ###Score Rubric:
 {criteria}
-###Feedback: 
+###Feedback:
 """
 
 answer_prompt_prometheus = """{assessment_prompt}{assessment} [RESULT] """
@@ -137,28 +137,43 @@ Answer: Response """
 
 pairwise_comparison_template_dict = {
     ModelFamilyEnum.MIXTRAL: {
-        "assessment": InputOutputTemplate(input_format=assessment_prompt_mixtral), 
+        "assessment": InputOutputTemplate(input_format=assessment_prompt_mixtral),
         "summarization": InputOutputTemplate(input_format=summarization_prompt_mixtral),
-        "answer" : InputOutputTemplate(input_format=answer_prompt_mixtral)
+        "answer": InputOutputTemplate(
+            input_format=answer_prompt_mixtral,
+            postprocessors=["processors.match_closest_option"],
+        ),
     },
     ModelFamilyEnum.GRANITE: {
-        "assessment": InputOutputTemplate(input_format=assessment_prompt_granite), 
+        "assessment": InputOutputTemplate(input_format=assessment_prompt_granite),
         "summarization": InputOutputTemplate(input_format=summarization_prompt_granite),
-        "answer" : InputOutputTemplate(input_format=answer_prompt_granite)
+        "answer": InputOutputTemplate(
+            input_format=answer_prompt_granite,
+            postprocessors=["processors.match_closest_option"],
+        ),
     },
     ModelFamilyEnum.LLAMA3: {
-        "assessment": InputOutputTemplate(input_format=assessment_prompt_llama), 
+        "assessment": InputOutputTemplate(input_format=assessment_prompt_llama),
         "summarization": InputOutputTemplate(input_format=summarization_prompt_llama),
-        "answer" : InputOutputTemplate(input_format=answer_prompt_llama)
+        "answer": InputOutputTemplate(
+            input_format=answer_prompt_llama,
+            postprocessors=["processors.match_closest_option"],
+        ),
     },
     ModelFamilyEnum.GPT: {
-        "assessment": InputOutputTemplate(input_format=assessment_prompt_gpt), 
+        "assessment": InputOutputTemplate(input_format=assessment_prompt_gpt),
         "summarization": InputOutputTemplate(input_format=summarization_prompt_gpt),
-        "answer" : InputOutputTemplate(input_format=answer_prompt_gpt)
+        "answer": InputOutputTemplate(
+            input_format=answer_prompt_gpt,
+            postprocessors=["processors.match_closest_option"],
+        ),
     },
     ModelFamilyEnum.PROMETHEUS: {
-        "assessment": InputOutputTemplate(input_format=assessment_prompt_prometheus), 
-        "summarization": None, 
-        "answer": InputOutputTemplate(input_format=answer_prompt_prometheus)
-    }
+        "assessment": InputOutputTemplate(input_format=assessment_prompt_prometheus),
+        "summarization": None,
+        "answer": InputOutputTemplate(
+            input_format=answer_prompt_prometheus,
+            postprocessors=["processors.match_closest_option"],
+        ),
+    },
 }

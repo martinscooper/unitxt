@@ -9,7 +9,6 @@ from unitxt.inference import (
     HFLlavaInferenceEngine,
     HFOptionSelectingInferenceEngine,
     HFPipelineBasedInferenceEngine,
-    IbmGenAiInferenceEngine,
     LiteLLMInferenceEngine,
     OptionSelectingByLogProbsInferenceEngine,
     RITSInferenceEngine,
@@ -197,15 +196,24 @@ class TestInferenceEngine(UnitxtInferenceTestCase):
                 },
             },
         ]
+        engines = []
 
-        genai_engine = IbmGenAiInferenceEngine(
-            model_name="mistralai/mixtral-8x7b-instruct-v01"
-        )
-        watsonx_engine = WMLInferenceEngineGeneration(
-            model_name="mistralai/mixtral-8x7b-instruct-v01"
-        )
+        # genai_engine = IbmGenAiInferenceEngine(
+        #     model_name="mistralai/mixtral-8x7b-instruct-v01"
+        # )
+        # engines.append(genai_engine)
 
-        for engine in [genai_engine, watsonx_engine]:
+        # watsonx_engine = WMLInferenceEngineGeneration(
+        #     model_name="mistralai/mixtral-8x7b-instruct-v01"
+        # )
+        # engines.append(watsonx_engine)
+
+        rits_engine = RITSInferenceEngine(
+            model_name="mistralai/mixtral-8x7b-instruct-v01",
+        )
+        engines.append(rits_engine)
+
+        for engine in engines:
             dataset = cast(OptionSelectingByLogProbsInferenceEngine, engine).select(
                 dataset
             )

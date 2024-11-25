@@ -178,6 +178,8 @@ class MatchClosestOption(InstanceFieldOperator):
     options_field: str = "options"
 
     def process_instance_value(self, value: Any, instance: Dict[str, Any]):
+        print('instance["task_data"]')
+        print(instance["task_data"].keys())
         options = instance["task_data"][self.options_field]
         return get_close_matches(value, options, n=1, cutoff=0.0)[0]
 
